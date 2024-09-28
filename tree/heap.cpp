@@ -99,6 +99,10 @@ int MaxHeap::removeMax()
 	arr[0] = arr[heapSize - 1];
 	heapSize--;
 
+	//root의 두 자식이 서브 트리 중에서 가장 큰 값들이다.
+	//이유는 insert 과정에서 큰 값들이 위로 올라가기 때문이다.
+	//가장 마지막 원소를 root로 보낸 후, MaxHeapify 함수를 통해 원소들의
+	//대소를 비교하여 정렬한다.
 	MaxHeapify(0);
 
 	return root;
