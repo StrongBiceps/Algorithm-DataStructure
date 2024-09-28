@@ -7,7 +7,7 @@ template<typename T>
 class node
 {
 public:
-    //Initializer_list¸¦ »ç¿ëÇÏ¿© »ý¼ºÇÏ·Á¸é ±âº» »ý¼ºÀÚ°¡ Á¸ÀçÇÏÁö ¾Ê¾Æ¾ß ÇÑ´Ù.
+    //Initializer_listë¥¼ ì‚¬ìš©í•˜ì—¬ ìƒì„±í•˜ë ¤ë©´ ê¸°ë³¸ ìƒì„±ìžê°€ ì¡´ìž¬í•˜ì§€ ì•Šì•„ì•¼ í•œë‹¤.
     ~node()
     {
         if (data)
@@ -43,7 +43,7 @@ public:
         return *data;
     }
 
-    //Initializer_list¸¦ »ç¿ëÇÏ¿© »ý¼ºÇÏ·Á¸é ¸â¹ö°¡ publicÀÌ¾î¾ß ÇÑ´Ù.
+    //Initializer_listë¥¼ ì‚¬ìš©í•˜ì—¬ ìƒì„±í•˜ë ¤ë©´ ë©¤ë²„ê°€ publicì´ì–´ì•¼ í•œë‹¤.
 public:
     T* data{ nullptr };
     node* next{ nullptr };
@@ -140,6 +140,7 @@ public:
     }
     void Release()
     {
+        cursor = head;
         while (cursor != tail)
         {
             auto toDelete = cursor->next;
@@ -149,6 +150,10 @@ public:
 
         delete cursor;
         cursor = nullptr;
+
+        delete head;
+        head = nullptr;
+        tail = nullptr;
     }
 private:
     node<T>* head{ nullptr };
