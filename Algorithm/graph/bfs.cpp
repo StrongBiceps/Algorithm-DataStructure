@@ -65,7 +65,7 @@ ostream& operator<< (ostream& os, const Graph<T>& G)
 	return os;
 }
 
-//±×·¡ÇÁ¸¦ »ı¼ºÇÏ°í ¹İÈ¯ÇÏ´Â ÇÔ¼ö¸¦ ÀÛ¼ºÇÑ´Ù.
+//ê·¸ë˜í”„ë¥¼ ìƒì„±í•˜ê³  ë°˜í™˜í•˜ëŠ” í•¨ìˆ˜ë¥¼ ì‘ì„±í•œë‹¤.
 template <typename T>
 auto create_reference_graph()
 {
@@ -88,13 +88,14 @@ auto create_reference_graph()
 	return G;
 }
 
-//³Êºñ ¿ì¼± Å½»ö ¾Ë°í¸®ÁòÀ» ´ÙÀ½°ú °°ÀÌ ±¸ÇöÇÑ´Ù.
+//ë„ˆë¹„ ìš°ì„  íƒìƒ‰ ì•Œê³ ë¦¬ì¦˜ì„ ë‹¤ìŒê³¼ ê°™ì´ êµ¬í˜„í•œë‹¤.
 template<typename T>
 auto breadth_first_search(const Graph<T>& G, unsigned start)
 {
 	queue<unsigned> queue;
-	set<unsigned> visited; //¹æ¹®ÇÑ Á¤Á¡
-	vector<unsigned> visit_order; //¹æ¹® ¼ø¼­
+	//ë¹ ë¥¸ íƒìƒ‰ì„ ìœ„í•´ì„œ ì„ í˜• ìë£Œêµ¬ì¡°ê°€ ì•„ë‹Œ setì„ ì‚¬ìš©í•œë‹¤.
+	set<unsigned> visited; //ë°©ë¬¸í•œ ì •ì 
+	vector<unsigned> visit_order; //ë°©ë¬¸ ìˆœì„œ
 	queue.push(start);
 
 	while (!queue.empty())
@@ -102,7 +103,7 @@ auto breadth_first_search(const Graph<T>& G, unsigned start)
 		auto current_vertex = queue.front();
 		queue.pop();
 
-		//ÇöÀç Á¤Á¡À» ÀÌÀü¿¡ ¹æ¹®ÇÏÁö ¾Ê¾Ò´Ù¸é
+		//í˜„ì¬ ì •ì ì„ ì´ì „ì— ë°©ë¬¸í•˜ì§€ ì•Šì•˜ë‹¤ë©´
 		if (visited.find(current_vertex) == visited.end())
 		{
 			visited.insert(current_vertex);
@@ -110,7 +111,7 @@ auto breadth_first_search(const Graph<T>& G, unsigned start)
 
 			for (auto& e : G.edges(current_vertex))
 			{
-				//ÀÎÁ¢ÇÑ Á¤Á¡ Áß¿¡¼­ ¹æ¹®ÇÏÁö ¾ÊÀº Á¤Á¡ÀÌ ÀÖ´Ù¸é Å¥¿¡ Ãß°¡
+				//ì¸ì ‘í•œ ì •ì  ì¤‘ì—ì„œ ë°©ë¬¸í•˜ì§€ ì•Šì€ ì •ì ì´ ìˆë‹¤ë©´ íì— ì¶”ê°€
 				if (visited.find(e.dst) == visited.end())
 				{
 					queue.push(e.dst);
@@ -121,14 +122,14 @@ auto breadth_first_search(const Graph<T>& G, unsigned start)
 	return visit_order;
 }
 
-//BFS¾Ë°í¸®ÁòÀ» ½ÇÇàÇÑ´Ù. ½ÃÀÛ Á¤Á¡Àº ÀÓÀÇ·Î 1¹øÀ¸·Î ¼³Á¤ÇÑ´Ù.
+//BFSì•Œê³ ë¦¬ì¦˜ì„ ì‹¤í–‰í•œë‹¤. ì‹œì‘ ì •ì ì€ ì„ì˜ë¡œ 1ë²ˆìœ¼ë¡œ ì„¤ì •í•œë‹¤.
 int main()
 {
 	using T = unsigned;
 
-	//±×·¡ÇÁ °´Ã¼ »ı¼º
+	//ê·¸ë˜í”„ ê°ì²´ ìƒì„±
 	auto G = create_reference_graph<T>();
-	cout << "[ÀÔ·Â ±×·¡ÇÁ]" << endl;
+	cout << "[ì…ë ¥ ê·¸ë˜í”„]" << endl;
 	cout << G << endl;
 
 	auto bfs_visit_order = breadth_first_search(G, 1);
