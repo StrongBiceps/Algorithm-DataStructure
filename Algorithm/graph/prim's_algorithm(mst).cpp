@@ -6,6 +6,9 @@
 #include <limits>
 #include <string>
 
+// ì‹œìž‘ ì •ì ì—ì„œì˜ ê±°ë¦¬ê°€ ì¤‘ìš”í•œ ê²ƒì´ ì•„ë‹Œ, í˜„ìž¬ íŒë‹¨í•˜ê³  ìžˆëŠ” ì •ì ê³¼ ì—°ê²°ëœ ì •ì ë“¤ê³¼ì˜ ê±°ë¦¬ë§Œì´ ì¤‘ìš”í•˜ê¸° ë•Œë¬¸ì—,
+// ê±°ë¦¬ ê°’ì„ ì—ì§€ì˜ weightë§Œ ì‚¬ìš©í•´ì„œ íŒë‹¨í•œë‹¤.
+
 using namespace std;
 
 template <typename T>
@@ -66,7 +69,7 @@ ostream& operator<< (ostream& os, const Graph<U>& G)
 	return os;
 }
 
-//¿¡ÁöÀÇ °¡ÁßÄ¡°¡ Á¤ÀÇµÈ ±×·¡ÇÁ¸¦ ¹ÝÈ¯ÇÑ´Ù.
+//ì—ì§€ì˜ ê°€ì¤‘ì¹˜ê°€ ì •ì˜ëœ ê·¸ëž˜í”„ë¥¼ ë°˜í™˜í•œë‹¤.
 template <typename T>
 auto create_reference_graph()
 {
@@ -89,15 +92,15 @@ auto create_reference_graph()
 	return G;
 }
 
-//Á¤Á¡¿¡ °æ°è·ÎºÎÅÍ °Å¸® Á¤º¸¸¦ ÀúÀåÇÏ±â À§ÇØ »ç¿ëÇÒ Lable ±¸Á¶Ã¼¸¦ Á¤ÀÇÇÑ´Ù.
-//Lable °´Ã¼ ºñ±³´Â °Å¸® °ªÀ» ÀÌ¿ëÇÏµµ·Ï ºñ±³ ¿¬»êÀÚ¸¦ ¿À¹ö·ÎµùÇÑ´Ù.
+//ì •ì ì— ê²½ê³„ë¡œë¶€í„° ê±°ë¦¬ ì •ë³´ë¥¼ ì €ìž¥í•˜ê¸° ìœ„í•´ ì‚¬ìš©í•  Lable êµ¬ì¡°ì²´ë¥¼ ì •ì˜í•œë‹¤.
+//Lable ê°ì²´ ë¹„êµëŠ” ê±°ë¦¬ ê°’ì„ ì´ìš©í•˜ë„ë¡ ë¹„êµ ì—°ì‚°ìžë¥¼ ì˜¤ë²„ë¡œë”©í•œë‹¤.
 template <typename T>
 struct Label
 {
 	unsigned ID;
 	T distance;
 
-	// Label °´Ã¼ ºñ±³´Â °Å¸®(distance) °ªÀ» ÀÌ¿ë
+	// Label ê°ì²´ ë¹„êµëŠ” ê±°ë¦¬(distance) ê°’ì„ ì´ìš©
 	inline bool operator> (const Label<T>& l) const
 	{
 		return this->distance > l.distance;
@@ -107,42 +110,42 @@ struct Label
 template <typename T>
 auto prim_MST(const Graph<T>& G, unsigned src)
 {
-	// ÃÖ¼Ò Èü
-	//°Å¸®°¡ °¡Àå ÀÛÀº Á¤Á¡ÀÌ Top¿¡ À§Ä¡ÇÑ´Ù.
-	//Label<T> ÀÚ·áÇüÀ» vector<Label<T>>ÄÁÅ×ÀÌ³Ê¿¡ ÀúÀåÇÏ°í, °´Ã¼ ºñ±³¿¡´Â greater<Lable<T>> ÇÔ¼ö °´Ã¼¸¦ »ç¿ëÇÑ´Ù.
+	// ìµœì†Œ íž™
+	//ê±°ë¦¬ê°€ ê°€ìž¥ ìž‘ì€ ì •ì ì´ Topì— ìœ„ì¹˜í•œë‹¤.
+	//Label<T> ìžë£Œí˜•ì„ vector<Label<T>>ì»¨í…Œì´ë„ˆì— ì €ìž¥í•˜ê³ , ê°ì²´ ë¹„êµì—ëŠ” greater<Lable<T>> í•¨ìˆ˜ ê°ì²´ë¥¼ ì‚¬ìš©í•œë‹¤.
 	priority_queue<Label<T>, vector<Label<T>>, greater<Label<T>>> heap;
 
-	// ¸ðµç Á¤Á¡¿¡¼­ °Å¸® °ªÀ» ÃÖ´ë·Î ¼³Á¤
+	// ëª¨ë“  ì •ì ì—ì„œ ê±°ë¦¬ ê°’ì„ ìµœëŒ€ë¡œ ì„¤ì •
 	vector<T> distance(G.vertices(), numeric_limits<T>::max());
 
-	set<unsigned> visited;	// ¹æ¹®ÇÑ Á¤Á¡
-	vector<unsigned> MST;	// ÃÖ¼Ò ½ÅÀå Æ®¸®
+	set<unsigned> visited;	// ë°©ë¬¸í•œ ì •ì 
+	vector<unsigned> MST;	// ìµœì†Œ ì‹ ìž¥ íŠ¸ë¦¬
 
-	//½ÃÀÛ Á¤Á¡À» heap¿¡ ³Ö´Â´Ù.
+	//ì‹œìž‘ ì •ì ì„ heapì— ë„£ëŠ”ë‹¤.
 	heap.emplace(Label<T>{src, 0});
 
 	while (!heap.empty())
 	{
-		//°Å¸® °ªÀÌ °¡Àå ÀÛÀº Á¤Á¡ÀÌ ¼±ÅÃµÈ´Ù.
+		//ê±°ë¦¬ ê°’ì´ ê°€ìž¥ ìž‘ì€ ì •ì ì´ ì„ íƒëœë‹¤.
 		auto current_vertex = heap.top();
 		heap.pop();
 
-		//¸¸¾à ÇöÀç Á¤Á¡À» ¹æ¹®Çß´Ù¸é ¾Æ¹«·± ÀÛ¾÷À» ÇÏÁö ¾Ê´Â´Ù.
-		//±×·¯³ª ÇöÀç Á¤Á¡À» ÀÌÀü¿¡ ¹æ¹®ÇÏÁö ¾Ê¾Ò´Ù¸é ´ÙÀ½ ÀÛ¾÷À» ¼öÇàÇÑ´Ù.
-		//ÀÌÀü¿¡ ¹æ¹®Çß´ø Á¤Á¡¿¡ ´ëÇØ¼­´Â ¿¡Áö¸¦ Ãß°¡ÇÏ´Â ÀÛ¾÷À» ÇÏÁö ¾ÊÀ¸¹Ç·Î »çÀÌÅ¬ÀÌ »ý¼ºµÉ ¼ö ¾ø´Ù.
+		//ë§Œì•½ í˜„ìž¬ ì •ì ì„ ë°©ë¬¸í–ˆë‹¤ë©´ ì•„ë¬´ëŸ° ìž‘ì—…ì„ í•˜ì§€ ì•ŠëŠ”ë‹¤.
+		//ê·¸ëŸ¬ë‚˜ í˜„ìž¬ ì •ì ì„ ì´ì „ì— ë°©ë¬¸í•˜ì§€ ì•Šì•˜ë‹¤ë©´ ë‹¤ìŒ ìž‘ì—…ì„ ìˆ˜í–‰í•œë‹¤.
+		//ì´ì „ì— ë°©ë¬¸í–ˆë˜ ì •ì ì— ëŒ€í•´ì„œëŠ” ì—ì§€ë¥¼ ì¶”ê°€í•˜ëŠ” ìž‘ì—…ì„ í•˜ì§€ ì•Šìœ¼ë¯€ë¡œ ì‚¬ì´í´ì´ ìƒì„±ë  ìˆ˜ ì—†ë‹¤.
 		if (visited.find(current_vertex.ID) == visited.end())
 		{
-			//¹æ¹®ÇÑ Á¤Á¡À» ÃÖ¼Ò ½ÅÀå Æ®¸®¿¡ Áý¾î ³Ö´Â´Ù.
+			//ë°©ë¬¸í•œ ì •ì ì„ ìµœì†Œ ì‹ ìž¥ íŠ¸ë¦¬ì— ì§‘ì–´ ë„£ëŠ”ë‹¤.
 			MST.push_back(current_vertex.ID);
 
-			//ÇöÀç Á¤Á¡¿¡¼­ »¸¾î ³ª°¡´Â ¿¡ÁöÀÇ ¸®½ºÆ®¸¦ È°¿ëÇÏ¿© ÀÎÁ¢ Á¤Á¡µéÀÇ °Å¸®¸¦ ´Ù½Ã ¼³Á¤ÇÑ´Ù.
+			//í˜„ìž¬ ì •ì ì—ì„œ ë»—ì–´ ë‚˜ê°€ëŠ” ì—ì§€ì˜ ë¦¬ìŠ¤íŠ¸ë¥¼ í™œìš©í•˜ì—¬ ì¸ì ‘ ì •ì ë“¤ì˜ ê±°ë¦¬ë¥¼ ë‹¤ì‹œ ì„¤ì •í•œë‹¤.
 			for (auto& e : G.edges(current_vertex.ID))
 			{
 				auto neighbor = e.dst;
 				auto new_distance = e.weight;
 
-				// ÀÎÁ¢ÇÑ Á¤Á¡ÀÇ °Å¸® °ªÀÌ »õ·Î¿î °æ·Î¿¡ ÀÇÇÑ °Å¸® °ªº¸´Ù Å©¸é
-				// Èü¿¡ Ãß°¡ÇÏ°í, °Å¸® °ªÀ» ¾÷µ¥ÀÌÆ®ÇÔ.
+				// ì¸ì ‘í•œ ì •ì ì˜ ê±°ë¦¬ ê°’ì´ ìƒˆë¡œìš´ ê²½ë¡œì— ì˜í•œ ê±°ë¦¬ ê°’ë³´ë‹¤ í¬ë©´
+				// íž™ì— ì¶”ê°€í•˜ê³ , ê±°ë¦¬ ê°’ì„ ì—…ë°ì´íŠ¸í•¨.
 				if (new_distance < distance[neighbor])
 				{
 					heap.emplace(Label<T>{neighbor, new_distance});
@@ -150,7 +153,7 @@ auto prim_MST(const Graph<T>& G, unsigned src)
 				}
 			}
 
-			//¹æ¹®ÇÑ Á¤Á¡¿¡ ÇöÀç Á¤Á¡À» Ãß°¡ÇÑ´Ù.
+			//ë°©ë¬¸í•œ ì •ì ì— í˜„ìž¬ ì •ì ì„ ì¶”ê°€í•œë‹¤.
 			visited.insert(current_vertex.ID);
 		}
 	}
@@ -167,14 +170,14 @@ int main()
 {
 	using T = unsigned;
 
-	// ±×·¡ÇÁ °´Ã¼ »ý¼º
+	// ê·¸ëž˜í”„ ê°ì²´ ìƒì„±
 	auto G = create_reference_graph<T>();
-	cout << "[ÀÔ·Â ±×·¡ÇÁ]" << endl;
+	cout << "[ìž…ë ¥ ê·¸ëž˜í”„]" << endl;
 	cout << G << endl;
 
 	auto MST = prim_MST<T>(G, 1);
 
-	cout << "[ÃÖ¼Ò ½ÅÀå Æ®¸®]" << endl;
+	cout << "[ìµœì†Œ ì‹ ìž¥ íŠ¸ë¦¬]" << endl;
 	for (auto v : MST)
 		cout << v << endl;
 	cout << endl;
