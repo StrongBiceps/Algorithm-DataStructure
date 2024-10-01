@@ -24,6 +24,7 @@ size_t choose_pivot(std::vector<T>& data, size_t start, size_t end)
 
     size_t current = start;
 
+    //subsequenceë“¤ì˜ ì¤‘ì•™ê°’ì„ êµ¬í•˜ê³ , ì¤‘ì•™ê°’ë“¤ì˜ ì¤‘ì•™ê°’ì„ í”¼ë²—ìœ¼ë¡œ ì‚¬ìš©í•˜ì—¬ ì •ë ¬í•œë‹¤.
     for (size_t i = start; i <= end; i += 5)
     {
         size_t med_pos = sort_and_get_median(data, i, std::min(i + 4, end));
@@ -38,13 +39,12 @@ size_t choose_pivot(std::vector<T>& data, size_t start, size_t end)
 template <typename T>
 size_t partition(std::vector<T>& data, size_t start, size_t end, size_t pivot_pos)
 {
-
     std::iter_swap(data.begin() + end, data.begin() + pivot_pos);
 
     const auto& pivot = data[end];
     size_t current_small_loc = start;
 
-
+    //í”¼ë²—ì„ ë§ˆì§€ë§‰ ìœ„ì¹˜ë¡œ ë³´ë‚´ê³ , í”¼ë²—ë³´ë‹¤ ê°™ê±°ë‚˜ ì‘ì€ ê°’ë“¤ì„ ì™¼ìª½ìœ¼ë¡œ ì •ë ¬í•˜ê³ , í”¼ë²—ë³´ë‹¤ í° ê°’ë“¤ì€ ì˜¤ë¥¸ìª½ìœ¼ë¡œ ì •ë ¬í•œë‹¤.
     for (size_t i = start; i <= end; i++)
     {
         if (data[i] <= pivot)
@@ -56,7 +56,7 @@ size_t partition(std::vector<T>& data, size_t start, size_t end, size_t pivot_po
     return current_small_loc - 1;
 }
 
-//k¹øÂ° À§Ä¡¸¦ ¹İÈ¯ÇÏ´Â ÇÔ¼ö
+//kë²ˆì§¸ ìœ„ì¹˜ë¥¼ ë°˜í™˜í•˜ëŠ” í•¨ìˆ˜
 template <typename T>
 T quickselect_pos(std::vector<T>& data, size_t start, size_t end, size_t k)
 {
@@ -83,7 +83,7 @@ T quickselect_pos(std::vector<T>& data, size_t start, size_t end, size_t k)
     }
 }
 
-//k¹øÂ° °ªÀ» ¹İÈ¯ÇÏ´Â ÇÔ¼ö
+//kë²ˆì§¸ ê°’ì„ ë°˜í™˜í•˜ëŠ” í•¨ìˆ˜
 template <typename T>
 T quickselect(std::vector<T>& data, size_t start, size_t end, size_t k) {
     if (start == end)
@@ -124,59 +124,59 @@ int main() {
 sudo code
 
 function sort_and_get_median(data, start, end):
-    sort(data[start] to data[end])  // startºÎÅÍ end±îÁö Á¤·Ä
-    return (start + end) / 2  // Áß°£ ÀÎµ¦½º ¹İÈ¯
+    sort(data[start] to data[end])  // startë¶€í„° endê¹Œì§€ ì •ë ¬
+    return (start + end) / 2  // ì¤‘ê°„ ì¸ë±ìŠ¤ ë°˜í™˜
 
 function choose_pivot(data, start, end):
     if (end - start < 5):
-        return sort_and_get_median(data, start, end)  // 5°³ ¹Ì¸¸ÀÏ °æ¿ì Áß°£°ª ¹İÈ¯
+        return sort_and_get_median(data, start, end)  // 5ê°œ ë¯¸ë§Œì¼ ê²½ìš° ì¤‘ê°„ê°’ ë°˜í™˜
 
     current = start
     for i from start to end step 5:
-        med_pos = sort_and_get_median(data, i, min(i + 4, end))  // 5°³¾¿ ±×·ìÈ­ÇÏ¿© Áß°£°ª Ã£±â
-        swap(data[current], data[med_pos])  // Áß°£°ªÀ» ÇöÀç À§Ä¡·Î ÀÌµ¿
+        med_pos = sort_and_get_median(data, i, min(i + 4, end))  // 5ê°œì”© ê·¸ë£¹í™”í•˜ì—¬ ì¤‘ê°„ê°’ ì°¾ê¸°
+        swap(data[current], data[med_pos])  // ì¤‘ê°„ê°’ì„ í˜„ì¬ ìœ„ì¹˜ë¡œ ì´ë™
         current = current + 1
 
-    return quickselect_pos(data, start, current - 1, (current + start - 1) / 2)  // Áß°£°ªÀÇ À§Ä¡ ¹İÈ¯
+    return quickselect_pos(data, start, current - 1, (current + start - 1) / 2)  // ì¤‘ê°„ê°’ì˜ ìœ„ì¹˜ ë°˜í™˜
 
 function partition(data, start, end, pivot_pos):
-    swap(data[end], data[pivot_pos])  // ÇÇ¹şÀ» ¸¶Áö¸· À§Ä¡·Î ÀÌµ¿
+    swap(data[end], data[pivot_pos])  // í”¼ë²—ì„ ë§ˆì§€ë§‰ ìœ„ì¹˜ë¡œ ì´ë™
     pivot = data[end]
     current_small_loc = start
 
     for i from start to end:
         if (data[i] <= pivot):
-            swap(data[current_small_loc], data[i])  // ÀÛÀº ¿ø¼Ò¸¦ ¾ÕÂÊÀ¸·Î ÀÌµ¿
+            swap(data[current_small_loc], data[i])  // ì‘ì€ ì›ì†Œë¥¼ ì•ìª½ìœ¼ë¡œ ì´ë™
             current_small_loc = current_small_loc + 1
 
-    return current_small_loc - 1  // ÇÇ¹şÀÇ ÃÖÁ¾ À§Ä¡ ¹İÈ¯
+    return current_small_loc - 1  // í”¼ë²—ì˜ ìµœì¢… ìœ„ì¹˜ ë°˜í™˜
 
 function quickselect_pos(data, start, end, k):
     if (start == end):
-        return start  // ½ÃÀÛ°ú ³¡ÀÌ °°À¸¸é ÇØ´ç À§Ä¡ ¹İÈ¯
+        return start  // ì‹œì‘ê³¼ ëì´ ê°™ìœ¼ë©´ í•´ë‹¹ ìœ„ì¹˜ ë°˜í™˜
 
-    pivot_pos = choose_pivot(data, start, end)  // ÇÇ¹ş ¼±ÅÃ
-    pivot_pos = partition(data, start, end, pivot_pos)  // ÆÄÆ¼¼Ç ¼öÇà
+    pivot_pos = choose_pivot(data, start, end)  // í”¼ë²— ì„ íƒ
+    pivot_pos = partition(data, start, end, pivot_pos)  // íŒŒí‹°ì…˜ ìˆ˜í–‰
 
     if (pivot_pos == k):
-        return pivot_pos  // k¹øÂ° À§Ä¡¿Í ÀÏÄ¡ÇÏ¸é ¹İÈ¯
+        return pivot_pos  // kë²ˆì§¸ ìœ„ì¹˜ì™€ ì¼ì¹˜í•˜ë©´ ë°˜í™˜
     else if (pivot_pos < k):
-        return quickselect_pos(data, pivot_pos + 1, end, k)  // k°¡ ÇÇ¹ş ¿À¸¥ÂÊ¿¡ ÀÖÀ» ¶§
+        return quickselect_pos(data, pivot_pos + 1, end, k)  // kê°€ í”¼ë²— ì˜¤ë¥¸ìª½ì— ìˆì„ ë•Œ
     else:
-        return quickselect_pos(data, start, pivot_pos - 1, k)  // k°¡ ÇÇ¹ş ¿ŞÂÊ¿¡ ÀÖÀ» ¶§
+        return quickselect_pos(data, start, pivot_pos - 1, k)  // kê°€ í”¼ë²— ì™¼ìª½ì— ìˆì„ ë•Œ
 
 function quickselect(data, start, end, k):
     if (start == end):
-        return data[start]  // ½ÃÀÛ°ú ³¡ÀÌ °°À¸¸é ÇØ´ç °ª ¹İÈ¯
+        return data[start]  // ì‹œì‘ê³¼ ëì´ ê°™ìœ¼ë©´ í•´ë‹¹ ê°’ ë°˜í™˜
 
-    pivot_pos = choose_pivot(data, start, end)  // ÇÇ¹ş ¼±ÅÃ
-    pivot_pos = partition(data, start, end, pivot_pos)  // ÆÄÆ¼¼Ç ¼öÇà
+    pivot_pos = choose_pivot(data, start, end)  // í”¼ë²— ì„ íƒ
+    pivot_pos = partition(data, start, end, pivot_pos)  // íŒŒí‹°ì…˜ ìˆ˜í–‰
 
     if (pivot_pos == k):
-        return data[pivot_pos]  // k¹øÂ° À§Ä¡¿Í ÀÏÄ¡ÇÏ¸é ¹İÈ¯
+        return data[pivot_pos]  // kë²ˆì§¸ ìœ„ì¹˜ì™€ ì¼ì¹˜í•˜ë©´ ë°˜í™˜
     else if (pivot_pos < k):
-        return quickselect(data, pivot_pos + 1, end, k)  // k°¡ ÇÇ¹ş ¿À¸¥ÂÊ¿¡ ÀÖÀ» ¶§
+        return quickselect(data, pivot_pos + 1, end, k)  // kê°€ í”¼ë²— ì˜¤ë¥¸ìª½ì— ìˆì„ ë•Œ
     else:
-        return quickselect(data, start, pivot_pos - 1, k)  // k°¡ ÇÇ¹ş ¿ŞÂÊ¿¡ ÀÖÀ» ¶§
+        return quickselect(data, start, pivot_pos - 1, k)  // kê°€ í”¼ë²— ì™¼ìª½ì— ìˆì„ ë•Œ
 
 */
