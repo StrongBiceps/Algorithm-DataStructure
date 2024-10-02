@@ -12,3 +12,5 @@ function selectionSort(array A)
 		end if
 	end for
 end function
+
+// 선택 정렬은 최선, 최악의 경우 모두 O(n^2)의 시간 복잡도를 보인다.
