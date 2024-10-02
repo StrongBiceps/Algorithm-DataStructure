@@ -1,3 +1,10 @@
+//í€µ ì •ë ¬ì€ í‰ê· ,ìµœì„ ì˜ ê²½ìš° O(n log n)ì˜ ì‹œê°„ ë³µì¡ë„ë¥¼ ê°–ëŠ”ë‹¤.
+//í•˜ì§€ë§Œ í”¼ë²—ì„ ìµœì†Œ,ìµœëŒ“ê°’ìœ¼ë¡œ ê³ ë¥´ëŠ” ìµœì•…ì˜ ê²½ìš° O(n^2)ì˜ ì‹œê°„ ë³µì¡ë„ë¥¼ ê°–ëŠ”ë‹¤.
+
+// 1.í€µ ì •ë ¬ì€ ìµœì•…ì˜ ê²½ìš°ë¥¼ ì œì™¸í•˜ê³  ë³‘í•© ì •ë ¬, í™ ì •ë ¬ê³¼ ë™ì¼í•œ ì‹œê°„ ë³µì¡ë„ë¥¼ ê°€ì ¸ ë‹¤ë¥¸ ì •ë ¬ ì•Œê³ ë¦¬ì¦˜ë³´ë‹¤ ë¹ ë¥´ë‹¤.
+// 2.í•˜ì§€ë§Œ ìµœì•…ì˜ ê²½ìš° O(n^2)ê¹Œì§€ ê±¸ë¦¬ê¸° ë•Œë¬¸ì— ë¶ˆì•ˆì •í•˜ë‹¤.
+// 3.í€µ ì •ë ¬ì€ ì¶”ê°€ì ì¸ ê³µê°„ì„ ìš”êµ¬í•˜ì§€ ì•ŠëŠ”ë‹¤.
+
 #include <iostream>
 #include <vector>
 using namespace std;
@@ -5,26 +12,26 @@ using namespace std;
 template<typename T>
 auto partition(typename vector<T>::iterator begin, typename vector<T>::iterator end)
 {
-	//¼¼ °³ÀÇ ¹İº¹ÀÚ¸¦ »ı¼ºÇÑ´Ù.
-	//ÇÏ³ª´Â ÇÇ¹şÀ» °¡¸®Å°°í, ³ª¸ÓÁö µÑÀº º¤ÅÍÀÇ ½ÃÀÛ°ú ¸¶Áö¸· ¿ø¼Ò¸¦ °¡¸®Å²´Ù.
+	//ì„¸ ê°œì˜ ë°˜ë³µìë¥¼ ìƒì„±í•œë‹¤.
+	//í•˜ë‚˜ëŠ” í”¼ë²—ì„ ê°€ë¦¬í‚¤ê³ , ë‚˜ë¨¸ì§€ ë‘˜ì€ ë²¡í„°ì˜ ì‹œì‘ê³¼ ë§ˆì§€ë§‰ ì›ì†Œë¥¼ ê°€ë¦¬í‚¨ë‹¤.
 	auto pivot_val = *begin;
 	auto left_iter = begin + 1;
 	auto right_iter = end;
 
-	//ÇÇ¹şÀ» Áß½ÉÀ¸·Î ÇÇ¹şº¸´Ù ÀÛ°Å³ª °°Àº ¿ø¼ÒµéÀº ÇÇ¹şÀÇ ¿ŞÂÊÀ¸·Î ÀÌµ¿½ÃÅ°°í,
-	//ÇÇ¹şº¸´Ù Å« ¿ø¼ÒµéÀº ÇÇ¹şÀÇ ¿À¸¥ÂÊÀ¸·Î ÀÌµ¿½ÃÅ²´Ù.
+	//í”¼ë²—ì„ ì¤‘ì‹¬ìœ¼ë¡œ í”¼ë²—ë³´ë‹¤ ì‘ê±°ë‚˜ ê°™ì€ ì›ì†Œë“¤ì€ í”¼ë²—ì˜ ì™¼ìª½ìœ¼ë¡œ ì´ë™ì‹œí‚¤ê³ ,
+	//í”¼ë²—ë³´ë‹¤ í° ì›ì†Œë“¤ì€ í”¼ë²—ì˜ ì˜¤ë¥¸ìª½ìœ¼ë¡œ ì´ë™ì‹œí‚¨ë‹¤.
 	while (true)
 	{	
-		//º¤ÅÍÀÇ Ã¹ ¹øÂ° ¿ø¼ÒºÎÅÍ ½ÃÀÛÇÏ¿© ÇÇ¹şº¸´Ù Å« ¿ø¼Ò¸¦ Ã£´Â´Ù.
+		//ë²¡í„°ì˜ ì²« ë²ˆì§¸ ì›ì†Œë¶€í„° ì‹œì‘í•˜ì—¬ í”¼ë²—ë³´ë‹¤ í° ì›ì†Œë¥¼ ì°¾ëŠ”ë‹¤.
 		while (*left_iter <= pivot_val && distance(left_iter, right_iter) > 0)
 			++left_iter;
 
-		//º¤ÅÍÀÇ ¸¶Áö¸· ¿ø¼ÒºÎÅÍ ½ÃÀÛÇÏ¿© ¿ª¼øÀ¸·Î ÇÇ¹şº¸´Ù ÀÛÀº ¿ø¼Ò¸¦ Ã£´Â´Ù.
+		//ë²¡í„°ì˜ ë§ˆì§€ë§‰ ì›ì†Œë¶€í„° ì‹œì‘í•˜ì—¬ ì—­ìˆœìœ¼ë¡œ í”¼ë²—ë³´ë‹¤ ì‘ì€ ì›ì†Œë¥¼ ì°¾ëŠ”ë‹¤.
 		while (*right_iter > pivot_val && distance(left_iter, right_iter) > 0)
 			--right_iter;
 
-		//¸¸¾à left_iter¿Í right_iter°¡ °°´Ù¸é, ±³È¯ÇÒ ¿ø¼Ò°¡ ¾øÀ½À» ÀÇ¹ÌÇÑ´Ù.
-		//±×·¸Áö ¾ÊÀ¸¸é left_iter¿Í right_iter°¡ °¡¸®Å°´Â ¿ø¼Ò¸¦ ¼­·Î ±³È¯ÇÑ´Ù.
+		//ë§Œì•½ left_iterì™€ right_iterê°€ ê°™ë‹¤ë©´, êµí™˜í•  ì›ì†Œê°€ ì—†ìŒì„ ì˜ë¯¸í•œë‹¤.
+		//ê·¸ë ‡ì§€ ì•Šìœ¼ë©´ left_iterì™€ right_iterê°€ ê°€ë¦¬í‚¤ëŠ” ì›ì†Œë¥¼ ì„œë¡œ êµí™˜í•œë‹¤.
 		if (left_iter == right_iter)
 		{
 			break;
@@ -46,12 +53,12 @@ auto partition(typename vector<T>::iterator begin, typename vector<T>::iterator 
 template<typename T>
 void quick_sort(typename vector<T>::iterator begin, typename vector<T>::iterator last)
 {
-	//¸¸¾à º¤ÅÍ¿¡ ÇÏ³ª ÀÌ»óÀÇ ¿ø¼Ò°¡ ÀÖ´Ù¸é ºĞÇÒ ÀÛ¾÷À» ¼öÇàÇÑ´Ù.
+	//ë§Œì•½ ë²¡í„°ì— í•˜ë‚˜ ì´ìƒì˜ ì›ì†Œê°€ ìˆë‹¤ë©´ ë¶„í•  ì‘ì—…ì„ ìˆ˜í–‰í•œë‹¤.
 	if (distance(begin, last) >= 1)
 	{
 		auto partition_iter = partition<T>(begin, last);
 
-		//ºĞÇÒ ÀÛ¾÷¿¡ ÀÇÇØ »ı¼ºµÈ º¤ÅÍ¸¦ Àç±ÍÀûÀ¸·Î Á¤·Ä
+		//ë¶„í•  ì‘ì—…ì— ì˜í•´ ìƒì„±ëœ ë²¡í„°ë¥¼ ì¬ê·€ì ìœ¼ë¡œ ì •ë ¬
 		quick_sort<T>(begin, partition_iter - 1);
 		quick_sort<T>(partition_iter, last);
 	}
@@ -74,19 +81,19 @@ void run_quick_sort_test()
 	vector<double> S3{45.6, 1.0, 3.8, 1.01, 2.2, 3.9, 45.3, 5.5, 1.0, 2.0, 44.0, 5.0, 7.0 };
 	vector<char> C{'b', 'z', 'a', 'e', 'f', 't', 'q', 'u', 'y'};
 
-	cout << "Á¤·ÄµÇÁö ¾ÊÀº ÀÔ·Â º¤ÅÍ" << endl;
+	cout << "ì •ë ¬ë˜ì§€ ì•Šì€ ì…ë ¥ ë²¡í„°" << endl;
 	print_vector<int>(S1);
 	print_vector<float>(S2);
 	print_vector<double>(S3);
 	print_vector<char>(C);
 
-	//arr.end()´Â ¸Ç ¸¶Áö¸· ¿ø¼Ò ´ÙÀ½À» °¡¸®Å°¹Ç·Î end()-1À» Àü´ŞÇÑ´Ù.
+	//arr.end()ëŠ” ë§¨ ë§ˆì§€ë§‰ ì›ì†Œ ë‹¤ìŒì„ ê°€ë¦¬í‚¤ë¯€ë¡œ end()-1ì„ ì „ë‹¬í•œë‹¤.
 	quick_sort<int>(S1.begin(), S1.end() - 1);
 	quick_sort<float>(S2.begin(), S2.end() - 1);
 	quick_sort<double>(S3.begin(), S3.end() - 1);
 	quick_sort<char>(C.begin(), C.end() - 1);
 
-	cout << "Äü Á¤·Ä¿¡ ÀÇÇØ Á¤·ÄµÈ º¤ÅÍ" << endl;
+	cout << "í€µ ì •ë ¬ì— ì˜í•´ ì •ë ¬ëœ ë²¡í„°" << endl;
 	print_vector<int>(S1);
 	print_vector<float>(S2);
 	print_vector<double>(S3);
@@ -110,35 +117,35 @@ int main()
 sudo code
 
 function partition(begin, end):
-	pivot_val = value at begin  // ÇÇ¹ş °ª ¼³Á¤
-	left_iter = begin + 1  // ¿ŞÂÊ ¹İº¹ÀÚ
-	right_iter = end  // ¿À¸¥ÂÊ ¹İº¹ÀÚ
+	pivot_val = value at begin  // í”¼ë²— ê°’ ì„¤ì •
+	left_iter = begin + 1  // ì™¼ìª½ ë°˜ë³µì
+	right_iter = end  // ì˜¤ë¥¸ìª½ ë°˜ë³µì
 
 	while true:
-		// ÇÇ¹şº¸´Ù Å« ¿ø¼Ò¸¦ Ã£±â À§ÇØ ¿ŞÂÊÀ¸·Î Å½»ö
+		// í”¼ë²—ë³´ë‹¤ í° ì›ì†Œë¥¼ ì°¾ê¸° ìœ„í•´ ì™¼ìª½ìœ¼ë¡œ íƒìƒ‰
 		while value at left_iter <= pivot_val and distance(left_iter, right_iter) > 0:
 			increment left_iter
 
-		// ÇÇ¹şº¸´Ù ÀÛÀº ¿ø¼Ò¸¦ Ã£±â À§ÇØ ¿À¸¥ÂÊÀ¸·Î Å½»ö
+		// í”¼ë²—ë³´ë‹¤ ì‘ì€ ì›ì†Œë¥¼ ì°¾ê¸° ìœ„í•´ ì˜¤ë¥¸ìª½ìœ¼ë¡œ íƒìƒ‰
 		while value at right_iter > pivot_val and distance(left_iter, right_iter) > 0:
 			decrement right_iter
 
 		if left_iter == right_iter:
-			break  // ±³È¯ÇÒ ¿ø¼Ò°¡ ¾øÀ¸¸é Á¾·á
+			break  // êµí™˜í•  ì›ì†Œê°€ ì—†ìœ¼ë©´ ì¢…ë£Œ
 		else:
-			swap values at left_iter and right_iter  // ¿ø¼Ò ±³È¯
+			swap values at left_iter and right_iter  // ì›ì†Œ êµí™˜
 
 	if pivot_val > value at right_iter:
-		swap values at begin and right_iter  // ÇÇ¹ş À§Ä¡ ±³È¯
+		swap values at begin and right_iter  // í”¼ë²— ìœ„ì¹˜ êµí™˜
 
-	return right_iter  // ºĞÇÒµÈ ÇÇ¹şÀÇ À§Ä¡ ¹İÈ¯
+	return right_iter  // ë¶„í• ëœ í”¼ë²—ì˜ ìœ„ì¹˜ ë°˜í™˜
 
 function quick_sort(begin, last):
-	if distance(begin, last) >= 1:  // º¤ÅÍ¿¡ ÇÏ³ª ÀÌ»óÀÇ ¿ø¼Ò°¡ ÀÖÀ¸¸é
-		partition_iter = partition(begin, last)  // ºĞÇÒ ÀÛ¾÷ ¼öÇà
+	if distance(begin, last) >= 1:  // ë²¡í„°ì— í•˜ë‚˜ ì´ìƒì˜ ì›ì†Œê°€ ìˆìœ¼ë©´
+		partition_iter = partition(begin, last)  // ë¶„í•  ì‘ì—… ìˆ˜í–‰
 
-		// ºĞÇÒµÈ º¤ÅÍ¸¦ Àç±ÍÀûÀ¸·Î Á¤·Ä
-		quick_sort(begin, partition_iter - 1)  // ¿ŞÂÊ ºÎºĞ Á¤·Ä
-		quick_sort(partition_iter, last)  // ¿À¸¥ÂÊ ºÎºĞ Á¤·Ä
+		// ë¶„í• ëœ ë²¡í„°ë¥¼ ì¬ê·€ì ìœ¼ë¡œ ì •ë ¬
+		quick_sort(begin, partition_iter - 1)  // ì™¼ìª½ ë¶€ë¶„ ì •ë ¬
+		quick_sort(partition_iter, last)  // ì˜¤ë¥¸ìª½ ë¶€ë¶„ ì •ë ¬
 
 */
