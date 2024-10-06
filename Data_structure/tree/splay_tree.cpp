@@ -93,6 +93,36 @@ struct node* splay(struct node* root, int key)
     }
 }
 
+Node* insert(Node* root, int key)
+{
+    if (root == nullptr)
+        return newNode(key);
+
+    root = splay(root, key);
+
+    if (root->key == key)
+        return root;
+
+    Node* node = newNode(key);
+
+    //splay 과정이 끝나면 root는 key와 가장 가까운 값을 가질 것이다.
+    //이 과정에서, root의 left는 이미 key보다 작을 것이고, root의 right는 key보다 클 것이다.
+    //splay 시뮬레이션을 확인해보면, 확인할 수 있다. 따라서 아래와 같이 새로운 root의 자식을 변경해도 무방하다.
+    if (root->key > key) 
+    {
+        node->right = root;
+        node->left = root->left;
+        root->left = nullptr;
+    }
+    else 
+    {
+        node->left = root;
+        node->right = root->right;
+        root->right = nullptr;
+    }
+    return node;
+}
+
 /*
 * Splay Tree에서의 후속 노드 탐색 과정과 BST에서의 후속 노드 탐색 과정이 다른 이유 :
 *
