@@ -110,12 +110,14 @@ Node* insert(Node* root, int key)
     //splay 시뮬레이션을 확인해보면, 확인할 수 있다. 따라서 아래와 같이 새로운 root의 자식을 변경해도 무방하다.
     if (root->key > key) 
     {
+        //root의 left는 splay연산으로 인해서 key보다 작을 것이다.
         node->right = root;
         node->left = root->left;
         root->left = nullptr;
     }
     else 
     {
+        //root의 right는 splay연산으로 인해서 key보다 클 것이다.
         node->left = root;
         node->right = root->right;
         root->right = nullptr;
