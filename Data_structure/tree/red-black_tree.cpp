@@ -143,7 +143,7 @@ class RBTree
 	// Red - Red 위반을 해결한다.
 	void fixRedRed(Node* x)
 	{
-		// 만약 x가 root라면 색을 빨간색으로 바꾼다.
+		// 만약 x가 root라면 색을 검정색으로 바꾼다.
 		if (x == root)
 		{
 			x->color = BLACK;
@@ -164,6 +164,8 @@ class RBTree
 				parent->color = BLACK;
 				uncle->color = BLACK;
 				grandparent->color = RED;
+
+				//조부모를 빨간색으로 칠했기 때문에, 다시 Red Red 위반에 걸렸을 수도 있으므로 재귀한다.
 				fixRedRed(grandparent);
 			}
 			else
@@ -328,6 +330,8 @@ class RBTree
 				else
 				{
 					// 둘 중 하나가 Red라면, 어떠한 경우에서든 Black의 개수가 맞아야 하므로 u를 Black으로 칠한다.
+					// v가 검은색 노드라면, 검은색 개수가 하나 줄어들어서 다시 하나 채워주는 것이다.
+					// v가 빨간색 노드라면, 검은색 개수를 위반하지 않지만 위의 경우를 위해서 검은색으로 색칠하는 것이다.
 					u->color = BLACK;
 				}
 			}
@@ -357,8 +361,14 @@ class RBTree
 			if (sibling->color == RED)
 			{
 				//형제가 빨간색이라면 회전을 수행해야 한다.
+				//검은색 개수를 노드가 삭제된 서브 트리로 전파해주기 위한 회전이다.
+
+				//검은색을 하나 받아왔으므로 반대쪽과 개수를 맞추기 위해 새로운 부모 노드를 빨간색으로 칠한다.
 				parent->color = RED;
+
+				//Red Red 위반을 막기 위해서 형제를 검은색을 칠한다. (부모가 빨간색이 되었으므로)
 				sibling->color = BLACK;
+
 				if (sibling->isOnLeft())
 				{
 					// L Case
@@ -369,6 +379,8 @@ class RBTree
 					// R Case
 					leftRotate(parent);
 				}
+
+				//검은색 노드를 반대쪽 서브 트리에서 하나 받아왔으므로, x에서 발생할 수 있는 더블 블랙을 해결한다.
 				fixDoubleBlack(x);
 			}
 			else
