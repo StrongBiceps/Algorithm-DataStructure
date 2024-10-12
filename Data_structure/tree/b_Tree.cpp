@@ -1,74 +1,68 @@
 #include<iostream>
 #include <vector>
+#include <queue>
 using namespace std;
+
+int traverse_count{ 0 };
 
 // A BTree node
 class BTreeNode
 {
-	int* keys; // An array of keys
-	int t;	 // Minimum degree (defines the range for number of keys)
-	BTreeNode** C; // An array of child pointers
-	//vector<BTreeNode*> C;
-	int n;	 // Current number of keys
-	bool leaf; // Is true when node is leaf. Otherwise false
+	int* keys; // 키 배열
+	int t;	 // 최소 차수 ( 키 개수를 정의함.)
+	BTreeNode** C; // 자식 노드들에 대한 포인터
+	int n;	 // 노드가 보유한 현재 키 개수 ( 모든 노드는 최대 2^t - 1 개의 키를 가질 수 있다, 또한 최소 t-1 개의 키를 가져야 한다.)
+	bool leaf; // 리프 노드 여부
 public:
-	BTreeNode(int _t, bool _leaf); // Constructor
+	BTreeNode(int _t, bool _leaf); // 생성자
 
-	// A utility function to insert a new key in the subtree rooted with
-	// this node. The assumption is, the node must be non-full when this
-	// function is called
+	// 현재 노드를 루트로 갖는 서브 트리에 새로운 키를 삽입하는 함수,
+	// 이 함수가 호출되었을 때, 노드는 가득 차지 않아야 한다.
 	void insertNonFull(int k);
 
-	// A utility function to split the child y of this node. i is index of y in
-	// child array C[]. The Child y must be full when this function is called
+	// 현재 노드의 자식인 y 노드를 split하는 함수
+	// i는 자식 배열인 C[]의 인덱스이다.
+	// 이 함수가 호출될 때, y는 반드시 가득 차 있어야 한다.
 	void splitChild(int i, BTreeNode* y);
 
-	// A function to traverse all nodes in a subtree rooted with this node
+	// 현재 노드를 루트로 갖는 서브 트리를 순회하는 함수
 	void traverse();
 
-	// A function to search a key in the subtree rooted with this node.
-	BTreeNode* search(int k); // returns NULL if k is not present.
+	// 현재 노드를 루트로 갖는 서브 트리에서 k를 검색하는 함수
+	// 만약 k가 존재하지 않으면, NULL을 반환.
+	BTreeNode* search(int k);
 
-	// A wrapper function to remove the key k in subtree rooted with
-	// this node.
+	// 현재 노드를 루트로 갖는 서브 트리에서 k를 삭제하는 함수
 	void remove(int k);
 
-	// A function that returns the index of the first key that is greater
-	// or equal to k
+	// k보다 같거나 큰 가장 처음 키의 인덱스를 반환하는 함수
 	int findKey(int k);
 
-	// A function to remove the key present in idx-th position in
-	// this node which is a leaf
+	// 외부 노드인 현재 노드에서 idx 인덱스를 갖는 키를 제거하는 함수
 	void removeFromLeaf(int idx);
 
-	// A function to remove the key present in idx-th position in
-	// this node which is a non-leaf node
+	// 내부 노드인 현재 노드에서 idx 인덱스를 갖는 키를 제거하는 함수
 	void removeFromNonLeaf(int idx);
 
-	// A function to get the predecessor of the key- where the key
-	// is present in the idx-th position in the node
+	// 현재 노드의 idx 번째 키의 전임자 키를 반환하는 함수
 	int getPred(int idx);
 
-	// A function to get the successor of the key- where the key
-	// is present in the idx-th position in the node
+	// 현재 노드의 idx 번째 키의 후속자 키를 반환하는 함수
 	int getSucc(int idx);
 
-	// A function to fill up the child node present in the idx-th
-	// position in the C[] array if that child has less than t-1 keys
+	// 현재 노드의 idx 번째 자식 노드가 t-1개의 키보다 적게 가지고 있다면 해당 노드의 키를 채우는 함수
 	void fill(int idx);
 
-	// A function to borrow a key from the C[idx-1]-th node and place
-	// it in C[idx]th node
+	// 키를 C[idx-1] 노드에게 빌려와서 C[idx] 노드에 삽입하는 함수
 	void borrowFromPrev(int idx);
 
-	// A function to borrow a key from the C[idx+1]-th node and place it
-	// in C[idx]th node
+	// 키를 C[idx+1] 노드에게 빌려와서 C[idx] 노드에 삽입하는 함수
 	void borrowFromNext(int idx);
 
-	// A function to merge idx-th child of the node with (idx+1)th child of
-	// the node
+	// C[idx+1] 노드와 C[idx] 노드를 병합하는 함수
 	void merge(int idx);
 
+	// 현재 노드의 키를 출력.
 	void		printKeys()
 	{
 		for (size_t i = 0; i < n; ++i)
@@ -77,94 +71,102 @@ public:
 		}
 	}
 
+	// 자식 노드 포인터 배열을 반환.
 	BTreeNode** GetC()
 	{
 		return C;
 	}
 
-	// Make BTree friend of this so that we can access private members of this
-	// class in BTree functions
+	// B Tree 클래스에서 B Tree Node 클래스의 Private 멤버에 접근할 수 있게 하기 위함.
 	friend class BTree;
 };
 
-// A BTree
+// B Tree 클래스
 class BTree
 {
-	BTreeNode* root; // Pointer to root node
-	int t; // Minimum degree
+	BTreeNode* root; // 루트 노드를 가리키는 포인터
+	int t; // 최소 차수
 public:
-	// Constructor (Initializes tree as empty)
+	// 생성자
 	BTree(int _t)
 	{
-		root = NULL; t = _t;
+		root = NULL;
+		t = _t;
 	}
 
-	// function to traverse the tree
+	// 트리를 순회하는 함수
 	void traverse()
 	{
-		if (root != NULL) root->traverse();
+		if (root != NULL)
+			root->traverse();
 	}
 
-	// function to search a key in this tree
+	// 트리에서 k를 검색하는 함수
 	BTreeNode* search(int k)
 	{
 		return (root == NULL) ? NULL : root->search(k);
 	}
 
-	// The main function that inserts a new key in this B-Tree
+	// 트리에 새로운 키 k를 삽입하는 함수
 	void insert(int k);
 
+	// Root를 반환하는 함수
 	BTreeNode* GetRoot()
 	{
 		return root;
 	}
 
-	// The main function that removes a new key in this B-Tree
+	// B Tree에서 키 k를 삭제하는 함수
 	void remove(int k);
 };
 
-// Constructor for BTreeNode class
 BTreeNode::BTreeNode(int t1, bool leaf1)
 {
-	// Copy the given minimum degree and leaf property
 	t = t1;
 	leaf = leaf1;
 
-	// Allocate memory for maximum number of possible keys
-	// and child pointers
 	keys = new int[2 * t - 1];
+
+	//최소 차수가 3인 B Tree는 6개의 자식을 가질 수 있다.
 	C = new BTreeNode * [2 * t];
 
-	// Initialize the number of keys as 0
 	n = 0;
 }
 
-// Function to traverse all nodes in a subtree rooted with this node
 void BTreeNode::traverse()
 {
-	// There are n keys and n+1 children, traverse through n keys
-	// and first n children
-	int i;
-
-	cout << "Node-> " << endl;
-	for (i = 0; i < n; i++)
+	for (int i = 0; i < traverse_count; ++i)
 	{
-		// If this is not leaf, then before printing key[i],
-		// traverse the subtree rooted with child C[i].
-		if (leaf == false)
-			C[i]->traverse();
+		cout << '\t';
+	}
+
+	for (int i = 0; i < n; i++)
+	{
 		cout << " " << keys[i];
 	}
 
-	// Print the subtree rooted with last child
+	cout << endl;
+
 	if (leaf == false)
-		C[i]->traverse();
+	{
+		++traverse_count;
+	}
+
+	for (int i = 0; i <= n; ++i)
+	{
+		if (leaf == false)
+			C[i]->traverse();
+	}
+
+	if (leaf == false)
+	{
+		--traverse_count;
+	}
+
 
 	cout << endl;
 }
 
-// A utility function that returns the index of the first key that is
-// greater than or equal to k
 int BTreeNode::findKey(int k)
 {
 	int idx = 0;
@@ -193,20 +195,16 @@ BTreeNode* BTreeNode::search(int k)
 	return C[i]->search(k);
 }
 
-// A function to remove the key k from the sub-tree rooted with this node
 void BTreeNode::remove(int k)
 {
 	int idx = findKey(k);
 
-	// The key to be removed is present in this node
-	//현재 노드에 삭제하려는 키가 존재할 때
+	// 현재 노드에 삭제하려는 키가 존재할 때
 	if (idx < n && keys[idx] == k)
 	{
+		// 현재 노드가 리프 노드일 때, - removeFromLeaf 함수가 호출된다.
+		// 현재 노드가 내부 노드라면, - removeFromNonLeaf 함수가 호출된다.
 
-		// If the node is a leaf node - removeFromLeaf is called
-		// Otherwise, removeFromNonLeaf function is called
-
-		//현재 노드가 외부 노드일 때는 if 문 함수가 호출되고 내부 노드는 else문 함수가 호출된다.
 		if (leaf)
 			removeFromLeaf(idx);
 		else
@@ -214,7 +212,6 @@ void BTreeNode::remove(int k)
 	}
 	else
 	{
-
 		// If this node is a leaf node, then the key is not present in tree
 		if (leaf)
 		{
@@ -253,34 +250,26 @@ void BTreeNode::remove(int k)
 	return;
 }
 
-// A function to remove the idx-th key from this node - which is a leaf node
-//단순히 외부 노드의 키를 삭제하는 함수이다.
-//아래 코드는 직관적으로 이해할 수 있을 것이다.
+// 단순히 외부 노드의 키를 삭제하는 함수이다.
+// 아래 코드는 직관적으로 이해할 수 있을 것이다.
 void BTreeNode::removeFromLeaf(int idx)
 {
-
-	// Move all the keys after the idx-th pos one place backward
+	// idx 인덱스를 idx+1 값으로 덮어 씌운다.
 	for (int i = idx + 1; i < n; ++i)
 		keys[i - 1] = keys[i];
 
-	// Reduce the count of keys
+	// 키 개수를 하나 감소시킨다.
 	n--;
 
 	return;
 }
 
-// A function to remove the idx-th key from this node - which is a non-leaf node
 void BTreeNode::removeFromNonLeaf(int idx)
 {
-
 	int k = keys[idx];
 
-	// If the child that precedes k (C[idx]) has atleast t keys,
-	// find the predecessor 'pred' of k in the subtree rooted at
-	// C[idx]. Replace k by pred. Recursively delete pred
-	// in C[idx]
-	//현재 내부 노드에서 값을 삭제할 때는 현재 키의 인덱스와 대응하는 인덱스를 가진 자식의 서브트리에서 가장 큰 값을 삭제할 키 값과 바꾼다.
-	//그러면 삭제할 값은 외부 노드가 되어 트리를 내려가며 삭제할 수 있다.
+	// C[idx]의 키가 최소 t개 이상 존재할 때, k를 대체할 전임자 키를 찾는다.
+	// 그리고 해당 키와 삭제할 키를 교환하고 재귀적으로 C[idx]에서 삭제 함수를 호출한다.
 	if (C[idx]->n >= t)
 	{
 		int pred = getPred(idx);
@@ -288,12 +277,7 @@ void BTreeNode::removeFromNonLeaf(int idx)
 		C[idx]->remove(pred);
 	}
 
-	// If the child C[idx] has less that t keys, examine C[idx+1].
-	// If C[idx+1] has atleast t keys, find the successor 'succ' of k in
-	// the subtree rooted at C[idx+1]
-	// Replace k by succ
-	// Recursively delete succ in C[idx+1]
-	//만약 대응하는 인덱스의 자식의 키 값이 너무 적다면, 다음 자식으로 넘어가서 가장 왼쪽 노드를 대체자로 바꿔주고 위 코드와 똑같이 삭제한다.
+	// 만약 대응하는 인덱스의 자식의 키 값이 너무 적다면, 다음 자식으로 넘어가서 가장 왼쪽 노드를 대체자로 바꿔주고 위 코드와 똑같이 삭제한다.
 	else if (C[idx + 1]->n >= t)
 	{
 		int succ = getSucc(idx);
@@ -301,10 +285,9 @@ void BTreeNode::removeFromNonLeaf(int idx)
 		C[idx + 1]->remove(succ);
 	}
 
-	// If both C[idx] and C[idx+1] has less that t keys,merge k and all of C[idx+1]
-	// into C[idx]
-	// Now C[idx] contains 2t-1 keys
-	// Free C[idx+1] and recursively delete k from C[idx]
+	// 만약 C[idx]와 C[idx+1] 모두 t보다 적은 키를 가지고 있다면, C[idx+1]과 k를 C[idx]에 병합한다.
+	// 이제 C[idx]는 2*t-1 개의 키를 가질 것이다.
+	// C[idx]에서 다시 k를 삭제한다.
 	else
 	{
 		merge(idx);
@@ -313,15 +296,14 @@ void BTreeNode::removeFromNonLeaf(int idx)
 	return;
 }
 
-// A function to get predecessor of keys[idx]
 int BTreeNode::getPred(int idx)
 {
-	// Keep moving to the right most node until we reach a leaf
+	// 외부 노드를 만날 때 까지 내려가고, 외부 노드에서의 가장 오른쪽에 있는 키를 반환한다.
 	BTreeNode* cur = C[idx];
+
 	while (!cur->leaf)
 		cur = cur->C[cur->n];
 
-	// Return the last key of the leaf
 	return cur->keys[cur->n - 1];
 }
 
@@ -452,47 +434,39 @@ void BTreeNode::borrowFromNext(int idx)
 	return;
 }
 
-// A function to merge C[idx] with C[idx+1]
-// C[idx+1] is freed after merging
 void BTreeNode::merge(int idx)
 {
 	BTreeNode* child = C[idx];
 	BTreeNode* sibling = C[idx + 1];
 
-	// Pulling a key from the current node and inserting it into (t-1)th
-	// position of C[idx]
+	// 현재 노드의 idx번째 키를 child 노드의 가장 오른쪽 키로 삽입한다. (병합 시 child와 sibling은 t-1개의 키를 가진다)
 	child->keys[t - 1] = keys[idx];
 
-	// Copying the keys from C[idx+1] to C[idx] at the end
+	// C[idx+1]의 키를 C[idx]의 오른쪽으로 옮긴다.
 	for (int i = 0; i < sibling->n; ++i)
 		child->keys[i + t] = sibling->keys[i];
 
 	//위 코드들은 왼쪽 자식 - 부모 - 오른쪽 자식 으로 이루어진 노드를 생성하는 과정이다.
 
-	// Copying the child pointers from C[idx+1] to C[idx]
-	//병합할 자식들을 옮겨준다.
+	// C[idx+1]의 자식을 C[idx]의 자식으로 옮긴다. 병합할 자식들을 옮겨준다.
 	if (!child->leaf)
 	{
 		for (int i = 0; i <= sibling->n; ++i)
 			child->C[i + t] = sibling->C[i];
 	}
 
-	// Moving all keys after idx in the current node one step before -
-	// to fill the gap created by moving keys[idx] to C[idx]
+	// keys[idx]를 C[idx]로 옮겼으므로 빈 자리를 채운다.
 	for (int i = idx + 1; i < n; ++i)
 		keys[i - 1] = keys[i];
 
-	// Moving the child pointers after (idx+1) in the current node one
-	// step before
-	//자식이 하나 줄었으므로 왼쪽으로 밀어준다.
+	// C[idx+1] 이후의 자식들을 왼쪽으로 한 칸씩 밀어서 C[idx]를 지운다.
 	for (int i = idx + 2; i <= n; ++i)
 		C[i - 1] = C[i];
 
-	// Updating the key count of child and the current node
+	// 자식 노드와 현재 노드의 키 개수를 업데이트한다.
 	child->n += sibling->n + 1;
 	n--;
 
-	// Freeing the memory occupied by sibling
 	delete(sibling);
 	return;
 }
@@ -505,7 +479,6 @@ void BTree::remove(int k)
 		return;
 	}
 
-	// Call the remove function for root
 	root->remove(k);
 
 	// If the root node has 0 keys, make its first child as the new root
@@ -524,92 +497,83 @@ void BTree::remove(int k)
 	return;
 }
 
-// The main function that inserts a new key in this B-Tree
 void BTree::insert(int k)
 {
-	// If tree is empty
+	// 트리가 비었을 때,
 	if (root == NULL)
 	{
-		// Allocate memory for root
+		// 루트를 위해서 메모리를 할당한다.
 		root = new BTreeNode(t, true);
-		root->keys[0] = k; // Insert key
-		root->n = 1; // Update number of keys in root
+		root->keys[0] = k; // 키 삽입
+		root->n = 1; // 루트 노드의 키 개수를 업데이트
 	}
-	else // If tree is not empty
+	else // 만약 트리가 비어있지 않다면,
 	{
-		//루트 노드의 키가 가득 찼으면 분할 연산을 진행한다.
-		// If root is full, then tree grows in height
+		// 루트 노드의 키가 가득 찼으면 분할 연산을 진행한다. (트리의 높이가 커짐)
 		if (root->n == 2 * t - 1)
 		{
-			// Allocate memory for new root
+			// 새로운 루트를 위해서 메모리를 할당한다.
 			BTreeNode* s = new BTreeNode(t, false);
 
-			// Make old root as child of new root
-			//s의 첫 번째 자식을 root로 만든다.
+			// 새로운 루트 s의 첫 번째 자식을 기존의 root로 만든다.
 			s->C[0] = root;
 
-			// Split the old root and move 1 key to the new root
+			// 기존의 root를 분할하고, 1개의 키를 root로 넘긴다.
 			s->splitChild(0, root);
 
-			// New root has two children now. Decide which of the
-			// two children is going to have new key
+			// 새로운 루트는 이제 2개의 키를 가진다. 두 자식 중에서 어떤 자식이 새로운 키를 가질지 판단한다.
 			int i = 0;
+			// 새로운 루트의 키 보다 새로운 키가 크다면, 오른쪽 자식에 삽입한다.
 			if (s->keys[0] < k)
 				i++;
 			s->C[i]->insertNonFull(k);
 
-			// Change root
+			// 루트를 변경한다.
 			root = s;
 		}
-		else // If root is not full, call insertNonFull for root
+		else // 루트가 가득 차지 않았다면, 
 			root->insertNonFull(k);
 	}
 }
 
-// A utility function to insert a new key in this node
-// The assumption is, the node must be non-full when this
-// function is called
 void BTreeNode::insertNonFull(int k)
 {
-	// Initialize index as index of rightmost element
-	//현재 노드의 가장 큰 원소의 인덱스로 i를 설정한다.
+	// 현재 노드의 가장 큰 원소의 인덱스로 i를 설정한다.
 	int i = n - 1;
 
-	// If this is a leaf node
+	// 만약 현재 노드가 외부 노드라면,
 	if (leaf == true)
 	{
-		// The following loop does two things
-		// a) Finds the location of new key to be inserted
-		// b) Moves all greater keys to one place ahead
+		// 다음 루프는 두 가지 기능을 수행한다.
+		// a) 새로운 키가 삽입되어야 할 위치를 찾는다.
+		// b) 새로운 키보다 값이 큰 키들을 뒤로 한 칸씩 밀어준다.
 
-		//삽입 정렬 방식으로 키를 삽입한다.
+		// 삽입 정렬 방식으로 키를 삽입한다.
 		while (i >= 0 && keys[i] > k)
 		{
 			keys[i + 1] = keys[i];
 			i--;
 		}
 
-		// Insert the new key at found location
+		// 찾은 위치에 새로운 키를 삽입하고 키 개수를 증가시킨다.
 		keys[i + 1] = k;
 		n = n + 1;
 	}
-	else // If this node is not leaf
+	else // 만약 현재 노드가 내부 노드라면,
 	{
-		// Find the child which is going to have the new key
+		// 자식들 중에서 어떤 노드가 새로운 키를 가질지 판단한다.
 		while (i >= 0 && keys[i] > k)
 			i--;
 
-		// See if the found child is full
+		// 해당 자식이 가득 찼는지 판단한다.
 		if (C[i + 1]->n == 2 * t - 1)
 		{
-			// If the child is full, then split it
+			// 자식이 가득 찼다면, 분할한다.
 			splitChild(i + 1, C[i + 1]);
 
-			// After split, the middle key of C[i] goes up and
-			// C[i] is splitted into two. See which of the two
-			// is going to have the new key
+			// 분할 후, C[i+1]은 두 개의 노드로 분할되어 C[i + 1]의 중간 위치 키는 현재 노드로 올라올 것이다.
 
-			//분할한 후에 삽입할 키가 자식들 중에서 어느 자식에 들어가야 하는지 인덱스 i를 조정하는 코드이다.
+			// 분할한 후에 삽입할 키가 자식들 중에서 어느 자식에 들어가야 하는지 인덱스 i를 조정하는 코드이다.
 			if (keys[i + 1] < k)
 				i++;
 		}
@@ -617,68 +581,58 @@ void BTreeNode::insertNonFull(int k)
 	}
 }
 
-// A utility function to split the child y of this node
-// Note that y must be full when this function is called
 void BTreeNode::splitChild(int i, BTreeNode* y)
 {
-	// Create a new node which is going to store (t-1) keys
-	// of y
+	// y의 키 중에서 t-1개를 소유할 새로운 노드를 만든다.
 	BTreeNode* z = new BTreeNode(y->t, y->leaf);
 
 	// t = 3일 때는 노드를 분할하면 분할된 노드는 2개의 키를 가지게 된다.
 	z->n = t - 1;
 
-	// Copy the last (t-1) keys of y to z
-	//노드의 키를 2등분하여 분할하기 위한 코드
+	// 노드의 키를 2등분하여 분할하기 위한 코드
+	// y의 뒷 부분 키 t-1개를 z에 할당한다.
 	for (int j = 0; j < t - 1; j++)
 		z->keys[j] = y->keys[j + t];
 
-	// Copy the last t children of y to z
-	//B Tree에서 현재 노드가 꽉 찼고, 자식이 존재하는 경우는 반드시 자식의 개수가 n+1이 될 것이다.
-	//3차 B Tree를 예로 들면, 만약 현재 노드의 키 수가 1개이고 자식이 2개라고 하자, 그러면 그 자식 중에서
-	//하나가 삽입 과정에서 꽉 찼고, 분할 과정에서 현재 노드의 키 수가 하나 늘어날 것이다.
-	//그러면 자식 수는 3개가 되고, 현재 노드의 키 수는 2개가 될 것이다. 만약 또 하나의 자식이 꽉 찼으면
-	//분할 과정에서 현재 노드의 자식 개수는 4개가 되고 현재 키 수는 3개가 된다.(꽉 차게 됨) 따라서 자식은
-	//현재 노드의 키 수 + 1이 될 것이다. 즉, 현재 노드가 자식이 있는 상태에서 분할된다면 자식은 동일한 개수로
-	//분할된다. 현재 노드가 분할되면 두 개의 노드가 생길 것이고, 왼쪽 노드에 2개, 오른쪽 노드에 2개의 자식이 들어가게 될 것이다.
+	// y의 뒷 부분 3개의 자식을 z의 앞 부분 3개의 자식으로 설정한다.
+	// 만약 t가 3이면, 3,4,5 번째 자식을 z의 0,1,2 번째 자식으로 설정한다.
 	if (y->leaf == false)
 	{
 		for (int j = 0; j < t; j++)
 			z->C[j] = y->C[j + t];
 	}
 
-	// Reduce the number of keys in y
-	//분할한 후 해당 노드의 원소 수를 줄였다.
-	//y가 분할되었다면 5개 원소 중에서 1개가 부모로 올라가고 나머지 2개씩 y,z가 된다.
+	// 분할한 후 해당 노드의 원소 수를 줄인다.
+	// y가 분할되었다면 5개 원소 중에서 1개가 부모로 올라가고 나머지 2개씩 y,z가 된다.
 	y->n = t - 1;
 
-	// Since this node is going to have a new child,
-	// create space of new child
+	// 현재 노드가 새로운 자식을 가질 것이기 때문에, 새로운 노드를 위한 공간을 확보한다.
 	for (int j = n; j >= i + 1; j--)
 		C[j + 1] = C[j];
 
-	// Link the new child to this node
+	// y를 분할하여 생성된 z 노드를 i + 1 인덱스에 연결한다.
+	// 삽입 정렬에서 자리를 밀어주는 것과 동일하다.
 	C[i + 1] = z;
 
-	// A key of y will move to this node. Find the location of
-	// new key and move all greater keys one space ahead
+	// 새로운 키의 위치를 확보하기 위해서 새로운 키보다 큰 키들을 뒤로 한 칸씩 밀어준다.
 
-	//i의 의미는 삽입할 k가 현재 노드의 어떤 인덱스의 자식에 들어가야 하는지에 대한 변수이다.
-	//또한 현재 노드의 키 중에서 어떤 인덱스에 해당하는 지도 결정할 수 있다.
+	// 만약 현재 노드의 키가 2개이고, i가 0이라면,
+	// 0,1 번째 키가 1,2번째 위치로 이동하고, 0번째 위치에 새로운 키가 삽입된다.
+	// 키가 2개이고, i가 1이라면, 중간 위치에 삽입될 것이다.
+	// 0번째 자식이 분할된다면, 현재 노드의 키 중에서 가장 작은 값으로 들어가야 하므로 자리를 확보해주는 것이다.
 	for (int j = n - 1; j >= i; j--)
 		keys[j + 1] = keys[j];
 
-	// Copy the middle key of y to this node
+	// y의 키들의 중간 위치에 있는 키를 현재 노드로 옮긴다.
 	keys[i] = y->keys[t - 1];
 
-	// Increment count of keys in this node
+	// 현재 노드의 키 개수를 증가시킨다.
 	n = n + 1;
 }
 
-// Driver program to test above functions
 int main()
 {
-	//BTree t(3); // A B-Tree with minimum degree 3
+	//BTree t(3);
 	/*t.insert(10);
 	t.insert(20);
 	t.insert(5);
@@ -689,65 +643,49 @@ int main()
 	t.insert(17);*/
 
 	//5 6 10 12 20
-	BTree t(3); // A B-Tree with minimum degree 3
+	BTree t(3);
 
 	t.insert(1);
+	t.insert(2);
 	t.insert(3);
+	t.insert(4);
+	t.insert(5);
+	t.insert(6);
 	t.insert(7);
+	t.insert(8);
+	t.insert(9);
 	t.insert(10);
 	t.insert(11);
+	t.insert(12);
 	t.insert(13);
 	t.insert(14);
 	t.insert(15);
-	t.insert(18);
 	t.insert(16);
-	t.insert(19);
-	t.insert(24);
-	t.insert(25);
-	t.insert(26);
-	t.insert(21);
-	t.insert(4);
-	t.insert(5);
-	t.insert(20);
-	t.insert(22);
-	t.insert(2);
 	t.insert(17);
-	t.insert(12);
-	t.insert(6);
+	t.insert(18);
+	t.insert(19);
+	t.insert(20);
+	t.insert(21);
 
 	cout << "Traversal of tree constructed is\n";
 	t.traverse();
 	cout << endl;
 
-	t.remove(6);
-	cout << "Traversal of tree after removing 6\n";
+	traverse_count = 0;
+
+	t.remove(9);
+	cout << "Traversal of tree after removing 9\n";
 	t.traverse();
 	cout << endl;
 
-	t.remove(13);
-	cout << "Traversal of tree after removing 13\n";
+	traverse_count = 0;
+
+	t.remove(10);
+	cout << "Traversal of tree after removing 10\n";
 	t.traverse();
 	cout << endl;
 
-	t.remove(7);
-	cout << "Traversal of tree after removing 7\n";
-	t.traverse();
-	cout << endl;
-
-	t.remove(4);
-	cout << "Traversal of tree after removing 4\n";
-	t.traverse();
-	cout << endl;
-
-	t.remove(2);
-	cout << "Traversal of tree after removing 2\n";
-	t.traverse();
-	cout << endl;
-
-	t.remove(16);
-	cout << "Traversal of tree after removing 16\n";
-	t.traverse();
-	cout << endl;
+	traverse_count = 0;
 
 	return 0;
 }
