@@ -5,7 +5,9 @@ using namespace std;
 
 int traverse_count{ 0 };
 
-// A BTree node
+// B Tree는 노드의 키와 자식이 정렬된 순서를 유지하기 때문에, 키 개수 + 1개의 자식 개수를 가진다.
+
+// BTree node
 class BTreeNode
 {
 	int* keys; // 키 배열
@@ -175,23 +177,18 @@ int BTreeNode::findKey(int k)
 	return idx;
 }
 
-// Function to search key k in subtree rooted with this node
 BTreeNode* BTreeNode::search(int k)
 {
-	// Find the first key greater than or equal to k
 	int i = 0;
 	while (i < n && k > keys[i])
 		i++;
 
-	// If the found key is equal to k, return this node
 	if (keys[i] == k)
 		return this;
 
-	// If key is not found here and this is a leaf node
 	if (leaf == true)
 		return NULL;
 
-	// Go to the appropriate child
 	return C[i]->search(k);
 }
 
@@ -212,36 +209,22 @@ void BTreeNode::remove(int k)
 	}
 	else
 	{
-		// If this node is a leaf node, then the key is not present in tree
+		// 만약 이 노드가 리프 노드라면, k는 존재하지 않는다.
 		if (leaf)
 		{
 			cout << "The key " << k << " is does not exist in the tree\n";
 			return;
 		}
 
-		// The key to be removed is present in the sub-tree rooted with this node
-		// The flag indicates whether the key is present in the sub-tree rooted
-		// with the last child of this node
-
 		//현재 노드의 가장 마지막 자식에 삭제할 키가 속해있는지 확인하는 flag
 		bool flag = ((idx == n) ? true : false);
 
-		// If the child where the key is supposed to exist has less that t keys,
-		// we fill that child
-
-		//삭제할 키가 속해있을 자식이 t보다 키가 적을 경우, 예를 들어 3차 트리인데 키의 개수가 2개보다 적을 경우
-		//해당 자식을 fill해준다.
-		//왜냐하면 C[idx]의 서브트리에서 원소가 하나 줄어들면, B 트리 속성에 부합하지 않기 때문에 미리 병합해준다.
-		//예를 들어 C[idx]의 키가 1개이고 자식이 2개인데 C[idx]를 삭제하려면 자식들이 병합되어야 하고 병합하는 과정에서
-		//C[idx] 노드가 사라지게 되기 때문이다. 따라서 미리 병합시켜 주는 것이다.
+		// 만약 C[idx]의 키가 t보다 작다면, 키를 채워준다.
 		if (C[idx]->n < t)
 			fill(idx);
 
-		// If the last child has been merged, it must have merged with the previous
-		// child and so we recurse on the (idx-1)th child. Else, we recurse on the
-		// (idx)th child which now has atleast t keys
-		//만약 가장 마지막 자식이 병합되었을 때는 idx-1에서 삭제하는 것이 맞다.
-		//또한 자식들이 병합되면 현재 노드의 키 수가 하나 줄어든다.
+		// 만약 가장 마지막 자식이 병합되었을 때는 idx-1에서 삭제하는 것이 맞다.
+		// 또한 자식들이 병합되면 현재 노드의 키 수가 하나 줄어든다.
 		if (flag && idx > n)
 			C[idx - 1]->remove(k);
 		else
@@ -319,24 +302,17 @@ int BTreeNode::getSucc(int idx)
 	return cur->keys[0];
 }
 
-// A function to fill child C[idx] which has less than t-1 keys
 void BTreeNode::fill(int idx)
 {
-
-	// If the previous child(C[idx-1]) has more than t-1 keys, borrow a key
-	// from that child
-	//왼쪽에 있는 형제가 키가 충분할 경우 키를 빌려온다.
+	// 왼쪽에 있는 자식의 키가 t개 이상이라면, 키를 빌려온다.
 	if (idx != 0 && C[idx - 1]->n >= t)
 		borrowFromPrev(idx);
 
-	// If the next child(C[idx+1]) has more than t-1 keys, borrow a key
-	// from that child
+	// 오른쪽 있는 자식의 키가 t개 이상이라면, 키를 빌려온다.
 	else if (idx != n && C[idx + 1]->n >= t)
 		borrowFromNext(idx);
 
-	// Merge C[idx] with its sibling
-	// If C[idx] is the last child, merge it with its previous sibling
-	// Otherwise merge it with its next sibling
+	// C[idx]를 형제 노드와 병합한다. 만약 C[idx]가 마지막 노드라면, 이전 노드와 병합한다.
 	else
 	{
 		if (idx != n)
@@ -347,42 +323,38 @@ void BTreeNode::fill(int idx)
 	return;
 }
 
-// A function to borrow a key from C[idx-1] and insert it
-// into C[idx]
 void BTreeNode::borrowFromPrev(int idx)
 {
-
 	BTreeNode* child = C[idx];
 	BTreeNode* sibling = C[idx - 1];
 
-	// The last key from C[idx-1] goes up to the parent and key[idx-1]
-	// from parent is inserted as the first key in C[idx]. Thus, the  loses
-	// sibling one key and child gains one key
+	// C[idx-1]의 마지막 키가 부모로 올라가고, key[idx-1]키가 C[idx]의 첫 번째로 내려간다.
+	// 그러므로, 형제 노드는 키 하나를 잃고, child 노드는 키 하나를 얻는다.
 
-	// Moving all key in C[idx] one step ahead
+	// C[idx]의 모든 키를 오른쪽으로 한 칸씩 이동시킨다.
 	for (int i = child->n - 1; i >= 0; --i)
 		child->keys[i + 1] = child->keys[i];
 
-	// If C[idx] is not a leaf, move all its child pointers one step ahead
+	// 만약 C[idx]가 리프 노드가 아니라면, 자식들을 오른쪽으로 한 칸씩 이동시킨다.
+	// B Tree의 노드의 자식 수는, 키 + 1이다. 이유는 B Tree가 split하고 키를 부모로 한 개씩 올리는 과정을 보면 이해할 수 있다.
+	// 따라서 C배열의 out of range의 위험은 없다.
 	if (!child->leaf)
 	{
 		for (int i = child->n; i >= 0; --i)
 			child->C[i + 1] = child->C[i];
 	}
 
-	// Setting child's first key equal to keys[idx-1] from the current node
-	// 부모의 가장 오른쪽 키로 child의 가장 왼쪽 키를 설정한다.
+	// 부모 키를 자식으로 내린다. 이 때 child의 모든 키보다 작은 부모의 keys[idx-1]을 내려야 대소 비교가 정확하다.
 	child->keys[0] = keys[idx - 1];
 
 	// Moving sibling's last child as C[idx]'s first child
-	//형제에게서 원소를 빌렸을 때 형제는 자식 하나가 감소해야만 한다. 따라서 아래 코드를 실행한다.
-	//child의 가장 왼쪽 원소에 형제의 가장 오른쪽 원소를 넣으므로 원소의 대소 비교 원칙은 정확하다.
+	// 노드의 키가 하나 줄어들면, 키 개수 + 1의 자식 수를 유지해야 하므로 자식도 하나 줄어들어야 한다.
+	// 또한 키를 빌려오는 입장의 노드는, 키가 하나 늘었으므로 자식도 하나 늘어야 한다.
+	// 가장 오른쪽 자식을 빌려와야 대소 비교가 맞다.
 	if (!child->leaf)
 		child->C[0] = sibling->C[sibling->n];
 
-	// Moving the key from the sibling to the parent
-	// This reduces the number of keys in the sibling
-	//형제노드의 가장 마지막 키를 부모 노드의 가장 오른쪽 노드로 설정한다.
+	// 형제노드의 가장 마지막 키를 부모 노드로 올린다.
 	keys[idx - 1] = sibling->keys[sibling->n - 1];
 
 	child->n += 1;
@@ -391,43 +363,34 @@ void BTreeNode::borrowFromPrev(int idx)
 	return;
 }
 
-// A function to borrow a key from the C[idx+1] and place
-// it in C[idx]
 void BTreeNode::borrowFromNext(int idx)
 {
-
 	BTreeNode* child = C[idx];
 	BTreeNode* sibling = C[idx + 1];
 
-	// keys[idx] is inserted as the last key in C[idx]
-	//child의 가장 오른쪽 키를 부모 노드의 키로 바꾼다.
+	// child에 부모 노드의 keys[idx]를 삽입한다.
+	// 부모 노드의 keys[idx]에는 sibling의 가장 왼쪽 키가 삽입될 것이다.
 	child->keys[(child->n)] = keys[idx];
 
-	// Sibling's first child is inserted as the last child
-	// into C[idx]
 	//형제에게서 원소를 빌려왔기 때문에 자식도 하나 가져와야 한다. child는 원소가 늘었으므로 자식도 늘어야 하고,
 	//형제는 원소가 줄었으므로 자식도 줄어야 한다.
 	if (!(child->leaf))
 		child->C[(child->n) + 1] = sibling->C[0];
 
-	//The first key from sibling is inserted into keys[idx]
 	//키는 오른쪽 형제의 첫 번째 키로 바꾼다.
 	keys[idx] = sibling->keys[0];
 
-	// Moving all keys in sibling one step behind
+	// 모든 키를 왼쪽으로 한 칸씩 밀어서 빈 칸을 지워준다.
 	for (int i = 1; i < sibling->n; ++i)
 		sibling->keys[i - 1] = sibling->keys[i];
 
-	// Moving the child pointers one step behind
-	//가장 왼쪽 자식이 줄었으므로 옮겨준다.
+	// 가장 왼쪽 자식이 줄었으므로 옮겨준다.
 	if (!sibling->leaf)
 	{
 		for (int i = 1; i <= sibling->n; ++i)
 			sibling->C[i - 1] = sibling->C[i];
 	}
 
-	// Increasing and decreasing the key count of C[idx] and C[idx+1]
-	// respectively
 	child->n += 1;
 	sibling->n -= 1;
 
@@ -481,8 +444,8 @@ void BTree::remove(int k)
 
 	root->remove(k);
 
-	// If the root node has 0 keys, make its first child as the new root
-	//  if it has a child, otherwise set root as NULL
+	// 루트 노드의 키가 0개라면,
+	// 루트 노드의 자식이 존재한다면, 자식을 위로 올리고, 아니면 루트 노드를 NULL로 설정한다.
 	if (root->n == 0)
 	{
 		BTreeNode* tmp = root;
@@ -491,7 +454,6 @@ void BTree::remove(int k)
 		else
 			root = root->C[0];
 
-		// Free the old root
 		delete tmp;
 	}
 	return;
